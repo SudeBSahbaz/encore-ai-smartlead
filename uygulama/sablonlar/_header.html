@@ -1,0 +1,14 @@
+<nav class="navbar" aria-label="Ana menü">
+  <a class="wordmark logo" href="{{ url_for('sayfalar.ana_sayfa') }}" aria-label="ENCORE Anasayfa"><span>ENCORE</span></a>
+  <div class="global-search">
+    <div class="global-search-input-wrap"><span class="global-search-icon" aria-hidden="true">⌕</span><input id="eventSearchInput" type="search" placeholder="Etkinlik ara..." autocomplete="off" aria-label="Etkinlik ara"></div>
+    <div class="search-results" id="eventSearchResults" role="listbox" aria-label="Etkinlik arama sonuçları"></div>
+  </div>
+  <div class="nav-links">
+    <a href="{{ url_for('sayfalar.ana_sayfa') }}" class="{{ 'active' if request.path == '/' else '' }}">Anasayfa</a>
+    <a href="{{ url_for('sayfalar.profil') }}" class="{{ 'active' if request.path in ['/profil', '/profile'] else '' }}">Profilim</a>
+    <a href="{{ url_for('sayfalar.gise') }}" class="{{ 'active' if request.path in ['/boxoffice', '/box-office'] else '' }}">Gişe<span class="nav-cart-count" id="navCartCount" hidden>0</span></a>
+    <a href="{{ url_for('sayfalar.biletler') }}" class="{{ 'active' if request.path in ['/biletlerim', '/tickets'] else '' }}">Biletlerim</a>
+    <a href="{{ url_for('sayfalar.ayarlar') }}" class="{{ 'active' if request.path in ['/ayarlar', '/settings'] else '' }}">Ayarlar</a>
+  </div>
+</nav>

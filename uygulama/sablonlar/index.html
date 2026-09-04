@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ENCORE | Şehir senin için hazır</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  {% include '_header.html' %}
+  <main class="hero" id="top">
+    <section class="hero-left">
+      <div class="eyebrow">✦ Yapay zekâ destekli kültür asistanı</div>
+      <h1>Şehir <span class="gradient-text">senin için hazır.</span></h1>
+      <p class="hero-description">Bütçeni, boş zamanını, konumunu ve zevklerini ENCORE'a anlat. Saatlerce etkinlik aramak yerine sana özel kültür planını birlikte oluşturalım.</p>
+      <div class="hero-actions"><button class="primary-button" type="button" data-focus-chat>Planımı Oluştur</button><a class="secondary-button" href="#etkinlikler">Etkinlikleri Keşfet</a></div>
+      <div class="features" id="how"><div class="feature"><strong>Bütçeni bilir</strong><span>Aylık kültür bütçene göre seçim yapar.</span></div><div class="feature"><strong>Takvimine uyar</strong><span>Müsait olduğun günleri dikkate alır.</span></div><div class="feature"><strong>Yeni şeyler keşfeder</strong><span>Büyük etkinliklerin yanında bağımsız sahneleri de görünür kılar.</span></div></div>
+    </section>
+    <section class="assistant-card" id="assistant" aria-label="ENCORE yapay zekâ asistanı">
+      <div class="assistant-header"><div class="assistant-info"><div class="assistant-avatar">E</div><div><div class="assistant-name">ENCORE AI</div><div class="assistant-status"><span class="online-dot"></span>Kültür danışmanın hazır</div></div></div></div>
+      <div class="chat-area" id="mesajlar" aria-live="polite"><div class="bubble bot">Merhaba! 👋 Ben ENCORE. Sana özel bir kültür-sanat planı hazırlayabilirim. Bütçeni, uygun gününü, konumunu veya sevdiğin etkinlik türlerini anlatarak başlayabilirsin.</div></div>
+      <div class="quick-prompts" aria-label="Örnek sorular"><button class="quick-prompt" type="button" data-prompt="Bu ay 1500 TL bütçem var.">💳 1500 TL bütçem var</button><button class="quick-prompt" type="button" data-prompt="Bu hafta sonu İstanbul'da ne yapabilirim?">📅 Hafta sonu planı</button><button class="quick-prompt" type="button" data-prompt="Tiyatro ve stand-up seviyorum.">🎭 Tiyatro & stand-up</button></div>
+      <div class="chat-input-area"><input id="sohbetMesaj" maxlength="1200" placeholder="ENCORE'a bir şey sor..." aria-label="Sohbet mesajı"><button id="sohbetGonder" class="send-button" type="button">Gönder</button></div>
+      <div class="plan-save-prompt" id="planSavePrompt" hidden>
+        <div><strong>Planını kaybetme</strong><span>Üye olmadan kaydet, sonra dilediğinde hesabına taşı.</span></div>
+        <button type="button" id="planSaveOpen">Planımı Kaydet</button>
+      </div>
+      <form id="planSaveForm" class="plan-save-form" hidden>
+        <div class="plan-form-head"><div><strong>Planını Kaydet</strong><span>Plan bağlantın ve ilgili etkinlikler için bilgilerini bırak.</span></div><button type="button" id="planSaveClose" aria-label="Formu kapat">×</button></div>
+        <div class="plan-form-fields"><label><span>Ad Soyad</span><input name="isim" required minlength="2" maxlength="100" autocomplete="name" placeholder="Adını yaz"></label><label><span>Telefon</span><input name="telefon" required inputmode="tel" autocomplete="tel" placeholder="05xx xxx xx xx"></label></div>
+        <label class="consent-row"><input name="iletisim_izni" type="checkbox" required><span>Planımın kaydedilmesini ve ilgili etkinlikler için benimle iletişime geçilmesini kabul ediyorum.</span></label>
+        <div class="plan-form-actions"><span id="planSaveStatus" aria-live="polite"></span><button class="primary-button" type="submit">Planımı Kaydet</button></div>
+      </form>
+      <p class="membership-invite" id="membershipInvite" hidden>Planın kaydedildi. Planlarını profilinde saklamak ve yönetmek ister misin? <a href="{{ url_for('sayfalar.profil') }}">Üye ol ve Profilim'e git →</a></p>
+    </section>
+  </main>
+  <section class="events-section" id="etkinlikler">
+    <div class="events-heading"><div><div class="eyebrow">✦ ŞEHİRDE NE VAR?</div><h2>Etkinlikleri keşfet.</h2><p>Konserden sinemaya, sergiden sahneye: şehirde seni bekleyenleri keşfet.</p></div><div class="event-categories" aria-label="Etkinlik kategorileri"><button class="category-chip active" type="button">Tümü</button><button class="category-chip" type="button">Konser</button><button class="category-chip" type="button">Tiyatro</button><button class="category-chip" type="button">Sergi</button><button class="category-chip" type="button">Sinema</button></div></div>
+    <div class="events-slider-wrap">
+      <button class="slider-arrow previous" type="button" aria-label="Önceki etkinlikler">‹</button>
+      <div class="events-track" id="eventsTrack">
+        {% for etkinlik in [
+          ('etkinlik-1','Konser','Etkinlik Başlığı','Yakında · İstanbul','750 TL'),
+          ('etkinlik-2','Tiyatro','Etkinlik Başlığı','Yakında · İstanbul','450 TL'),
+          ('etkinlik-3','Sergi','Etkinlik Başlığı','Yakında · İstanbul','Ücretsiz'),
+          ('etkinlik-4','Atölye','Etkinlik Başlığı','Yakında · İstanbul','600 TL'),
+          ('etkinlik-5','Sinema','Etkinlik Başlığı','Yakında · İstanbul','300 TL'),
+          ('etkinlik-6','Konser','Etkinlik Başlığı','Yakında · İstanbul','900 TL')
+        ] %}
+        <article class="event-card" data-event-id="{{ etkinlik[0] }}" data-title="{{ etkinlik[2] }}" data-price="{{ etkinlik[4] }}">
+          <div class="event-image-placeholder"><span>Görsel alanı</span></div>
+          <div class="event-card-body"><span class="event-type">{{ etkinlik[1] }}</span><h3>{{ etkinlik[2] }}</h3><p>{{ etkinlik[3] }}</p><div class="event-card-footer"><strong>{{ etkinlik[4] }}</strong><button class="add-to-boxoffice" type="button" aria-label="{{ etkinlik[2] }} etkinliğini gişeye ekle" title="Gişeye ekle">🎟</button></div></div>
+        </article>
+        {% endfor %}
+      </div>
+      <button class="slider-arrow next" type="button" aria-label="Sonraki etkinlikler">›</button>
+    </div>
+  </section>
+  <footer class="site-footer"><a class="wordmark" href="#top"><span>ENCORE</span></a><p>Şehir senin için hazır. · <a href="{{ url_for('sayfalar.panel') }}">Yönetim</a></p></footer>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

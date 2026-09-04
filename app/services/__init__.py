@@ -1,0 +1,1 @@
+"""Yapay zekâ servis paketi."""
