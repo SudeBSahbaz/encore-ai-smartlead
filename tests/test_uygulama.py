@@ -44,6 +44,8 @@ class EncoreTestleri(unittest.TestCase):
             self.assertIn("kesin uygun gün veya tarih ve saat aralığı", sistem)
             self.assertIn("Kullanıcı söylemeden belirli bir gün", sistem)
             self.assertIn("Hangi gün veya günlerde", sistem)
+            self.assertIn("müsaitlik TAMAMLANMIŞTIR", sistem)
+            self.assertIn("bu bilgiyi yeniden sorma", sistem)
             self.assertIn("Markdown tablosu", sistem)
             self.assertIn("canlı veya doğrulanmış etkinlik veri kaynağı bağlı DEĞİLDİR", sistem)
 
