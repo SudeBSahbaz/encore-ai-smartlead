@@ -45,6 +45,14 @@ class EncoreTestleri(unittest.TestCase):
             self.assertIn("Kullanıcı söylemeden belirli bir gün", sistem)
             self.assertIn("Hangi gün veya günlerde", sistem)
             self.assertIn("Markdown tablosu", sistem)
+            self.assertIn("canlı veya doğrulanmış etkinlik veri kaynağı bağlı DEĞİLDİR", sistem)
+
+    def test_yapay_zeka_markdown_yanitini_duz_metne_cevirir(self):
+        ham = "## Plan\n| Gün | Etkinlik |\n|---|---|\n| Cumartesi | Tiyatro |\n\n**Toplam:** 900 TL"
+        temiz = yapay_zeka_servisi._yaniti_temizle(ham)
+        self.assertEqual(temiz, "Plan\nGün - Etkinlik\nCumartesi - Tiyatro\n\nToplam: 900 TL")
+        self.assertNotIn("**", temiz)
+        self.assertNotIn("|", temiz)
 
     def test_sohbet_kaydedilir(self):
         cevap = self.client.post("/api/sohbet", json={"mesaj": "Bu hafta sonu bir konser arıyorum"})

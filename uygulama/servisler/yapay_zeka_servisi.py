@@ -1,3 +1,5 @@
+import re
+
 import requests
 from flask import current_app
 
@@ -9,6 +11,9 @@ class YapayZekaServisHatasi(RuntimeError):
 class YapayZekaServisi:
     GORUSME_PROTOKOLU = """
 ENCORE GÖRÜŞME PROTOKOLÜ:
+- Bu uygulamaya şu anda canlı veya doğrulanmış etkinlik veri kaynağı bağlı DEĞİLDİR. Bu nedenle
+  hiçbir koşulda örnek dahi olsa sanatçı, etkinlik, mekân, tarih, saat, fiyat ya da bilet bilgisi üretme.
+  Kullanıcı senden doğrudan liste istese bile doğrulanmış veri olmadan liste veremeyeceğini söyle.
 - Öneri hazırlamadan önce konuşmanın tamamından şu bilgileri netleştir: etkinlik türü/ilgi alanı;
   şehir, ilçe ve gidilebilecek mesafe; kesin uygun gün veya tarih ve saat aralığı; toplam bütçe;
   ulaşım tercihi.
@@ -24,6 +29,27 @@ ENCORE GÖRÜŞME PROTOKOLÜ:
 - Türkçe, sıcak, kısa ve doğrudan yaz. Normal sohbet metni kullan. Markdown tablosu, dikey çizgi,
   yıldızla kalınlaştırma veya karmaşık başlık kullanma. Soru yanıtları 120 kelimeyi geçmesin.
 """
+
+    @staticmethod
+    def _yaniti_temizle(metin):
+        """Model talimata rağmen Markdown döndürürse kullanıcıya düz metin gösterir."""
+        satirlar = []
+        for ham_satir in str(metin or "").splitlines():
+            satir = ham_satir.strip()
+            if not satir:
+                if satirlar and satirlar[-1] != "":
+                    satirlar.append("")
+                continue
+            if re.fullmatch(r"\|?(?:\s*:?-{3,}:?\s*\|)+\s*", satir):
+                continue
+            satir = re.sub(r"^#{1,6}\s*", "", satir)
+            satir = re.sub(r"^>\s*", "", satir)
+            satir = satir.replace("**", "").replace("__", "")
+            if "|" in satir:
+                hucreler = [hucre.strip() for hucre in satir.strip("|").split("|") if hucre.strip()]
+                satir = " - ".join(hucreler)
+            satirlar.append(satir)
+        return "\n".join(satirlar).strip()
 
     def yanit_uret(self, kullanici_mesaji, sohbet_gecmisi=None):
         saglayici = current_app.config.get("AI_PROVIDER", "demo").lower()
@@ -82,7 +108,7 @@ ENCORE GÖRÜŞME PROTOKOLÜ:
             icerik = cevap.json()["choices"][0]["message"]["content"].strip()
             if not icerik:
                 raise ValueError("Yapay zekâ boş yanıt döndürdü.")
-            return icerik
+            return self._yaniti_temizle(icerik)
         except (requests.RequestException, KeyError, IndexError, ValueError) as hata:
             raise YapayZekaServisHatasi("Yapay zeka servisine su anda ulasilamiyor. Lutfen tekrar deneyin.") from hata
 
@@ -95,7 +121,8 @@ ENCORE GÖRÜŞME PROTOKOLÜ:
         try:
             cevap = requests.post(url, json={"contents": [{"parts": [{"text": metin}]}]}, timeout=20)
             cevap.raise_for_status()
-            return cevap.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            icerik = cevap.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            return self._yaniti_temizle(icerik)
         except (requests.RequestException, KeyError, IndexError, ValueError) as hata:
             raise YapayZekaServisHatasi("Yapay zeka servisine su anda ulasilamiyor. Lutfen tekrar deneyin.") from hata
 
