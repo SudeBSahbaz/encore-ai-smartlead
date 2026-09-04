@@ -80,10 +80,29 @@ ENCORE GÖRÜŞME PROTOKOLÜ:
         for oge in (gecmis or [])[-10:]:
             if isinstance(oge, dict) and oge.get("role") in {"user", "assistant"}:
                 guvenli_gecmis.append({"role": oge["role"], "content": str(oge.get("content", ""))[:1200]})
+        tum_kullanici_metinleri = [
+            oge["content"] for oge in guvenli_gecmis if oge["role"] == "user"
+        ] + [str(mesaj)]
+        birlesik_metin = " ".join(tum_kullanici_metinleri).casefold()
+        tamamlanan_bilgiler = []
+        if re.search(r"\bbu ay\b", birlesik_metin):
+            tamamlanan_bilgiler.append(
+                "Kullanıcı tarih dönemi olarak içinde bulunulan ayı seçti; hafta veya tarih aralığını yeniden sorma."
+            )
+        esnek_gun = re.search(r"haftanın herhangi bir günü|herhangi bir gün|her gün|gün fark etmez", birlesik_metin)
+        saat_araligi = re.search(r"\b(?:[01]?\d|2[0-3])[.:][0-5]\d\s*[-–]\s*(?:[01]?\d|2[0-3])[.:][0-5]\d\b", birlesik_metin)
+        if esnek_gun and saat_araligi:
+            tamamlanan_bilgiler.append(
+                "Kullanıcının gün ve saat uygunluğu tamamlandı; belirli bir gün seçmesini isteme."
+            )
+        durum_notu = ""
+        if tamamlanan_bilgiler:
+            durum_notu = "\n\nKONUŞMADAN KESİN OLARAK TAMAMLANAN BİLGİLER:\n- " + "\n- ".join(tamamlanan_bilgiler)
+
         return [
             {
                 "role": "system",
-                "content": current_app.config["BUSINESS_CONTEXT"] + "\n\n" + self.GORUSME_PROTOKOLU,
+                "content": current_app.config["BUSINESS_CONTEXT"] + "\n\n" + self.GORUSME_PROTOKOLU + durum_notu,
             },
             *guvenli_gecmis,
             {"role": "user", "content": mesaj},

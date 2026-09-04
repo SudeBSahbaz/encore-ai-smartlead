@@ -56,6 +56,17 @@ class EncoreTestleri(unittest.TestCase):
         self.assertNotIn("**", temiz)
         self.assertNotIn("|", temiz)
 
+    def test_bu_ay_ve_esnek_gun_bilgisi_tamamlanmis_isaretlenir(self):
+        with self.app.app_context():
+            mesajlar = yapay_zeka_servisi._mesajlari_olustur(
+                "Haftanın herhangi bir günü 18.00-22.00 arasında müsaitim.",
+                [{"role": "user", "content": "Bu ay 1500 TL bütçem var."}],
+            )
+        sistem = mesajlar[0]["content"]
+        self.assertIn("içinde bulunulan ayı seçti", sistem)
+        self.assertIn("gün ve saat uygunluğu tamamlandı", sistem)
+        self.assertIn("belirli bir gün seçmesini isteme", sistem)
+
     def test_sohbet_kaydedilir(self):
         cevap = self.client.post("/api/sohbet", json={"mesaj": "Bu hafta sonu bir konser arıyorum"})
         self.assertEqual(cevap.status_code, 200)
