@@ -25,6 +25,7 @@ def uygulama_olustur(ayar_adi=None, ek_ayarlar=None):
         uygulama,
         resources={r"/api/*": {"origins": _cors_kokenleri(uygulama.config["CORS_ALLOWED_ORIGINS"]) }},
         methods=["GET", "POST", "OPTIONS"],
+        supports_credentials=True,
     )
     veritabani_baslat(uygulama)
 

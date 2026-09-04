@@ -40,7 +40,9 @@ class UretimAyarlari(Ayarlar):
     REQUIRE_ADMIN_API_AUTH = True
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Lax"
+    # Wix ve Render farklı alan adlarında çalıştığı için oturum çerezi
+    # yalnızca HTTPS üzerinden çapraz alan isteklerinde de gönderilebilmelidir.
+    SESSION_COOKIE_SAMESITE = "None"
 
 
 class TestAyarlari(Ayarlar):

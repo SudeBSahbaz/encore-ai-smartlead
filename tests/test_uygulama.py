@@ -67,6 +67,22 @@ class EncoreTestleri(unittest.TestCase):
         self.assertIn("gün ve saat uygunluğu tamamlandı", sistem)
         self.assertIn("belirli bir gün seçmesini isteme", sistem)
 
+    def test_wix_cors_oturum_bilgilerini_destekler(self):
+        app = uygulama_olustur("uretim", {
+            "DATABASE_URL": str(Path(self.gecici.name) / "cors.db"),
+            "CORS_ALLOWED_ORIGINS": "https://sudebsahbaz.wixsite.com",
+        })
+        client = app.test_client()
+        cevap = client.options("/api/sohbet", headers={
+            "Origin": "https://sudebsahbaz.wixsite.com",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        })
+        self.assertEqual(cevap.headers.get("Access-Control-Allow-Origin"), "https://sudebsahbaz.wixsite.com")
+        self.assertEqual(cevap.headers.get("Access-Control-Allow-Credentials"), "true")
+        self.assertEqual(app.config["SESSION_COOKIE_SAMESITE"], "None")
+        self.assertTrue(app.config["SESSION_COOKIE_SECURE"])
+
     def test_sohbet_kaydedilir(self):
         cevap = self.client.post("/api/sohbet", json={"mesaj": "Bu hafta sonu bir konser arıyorum"})
         self.assertEqual(cevap.status_code, 200)
