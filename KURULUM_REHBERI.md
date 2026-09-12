@@ -111,24 +111,26 @@ ENCORE Wix sitesi ile Flask backend’i arasındaki bağlantı Wix Velo aracıl�
 
 ### Landing ve kişisel asistan
 
-`docs/wix_landing_page.js` dosyası, Wix üzerindeki kişisel asistan ve plan kaydetme akışının örnek sayfa kodunu içerir.
+`docs/wix_landing_page.js` dosyası, Wix üzerinde çalışan güncel kişisel asistan sayfa kodunu içerir.
 
-Landing bileşenleri:
+Kişisel asistan bileşenleri:
 
-- `#inputQuestion`
-- `#btnAsk`
-- `#textAiReply`
-- `#boxSavePlan`
-- `#inputName`
-- `#inputPhone`
-- `#checkboxConsent`
-- `#btnSavePlan`
-- `#textSaveStatus`
-- `#boxMembershipInvite`
-- `#btnJoin`
-- `#btnLater`
+- `#inputMesaj`: Kullanıcının mesajını yazdığı alan
+- `#btnSor`: Mesajı yapay zekâya gönderen buton
+- `#html1`: Yüklenme durumunu ve yapay zekâ yanıtını gösteren HTML bileşeni
 
-Landing kodundaki API adresi, Render üzerinde yayımlanan ENCORE backend adresiyle değiştirilmelidir.
+Kişisel asistan:
+
+1. Kullanıcının mesajını `POST /api/sohbet` adresine gönderir.
+2. Önceki mesajları `gecmis` dizisiyle birlikte backend’e iletir.
+3. Yanıt hazırlanırken HTML bileşeninde bekleme durumu gösterir.
+4. Yapay zekâ yanıtını `postMessage()` ile HTML bileşenine aktarır.
+5. `credentials: 'include'` kullanarak Flask oturumunun korunmasını sağlar.
+
+Render API adresi:
+
+```text
+https://encore-ai-smartlead.onrender.com
 
 ### Yönetim paneli
 
