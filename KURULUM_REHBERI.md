@@ -4,52 +4,206 @@
 
 Standart teslim yapısı `run.py`, `config.py`, `app/`, `docs/` ve `tests/` klasörlerinden oluşur. Türkçe isimli özgün modüller korunmuş, İngilizce yollar uyumluluk katmanı olarak eklenmiştir.
 
+```text
+encore-ai-smartlead/
+├── run.py
+├── baslat.py
+├── config.py
+├── ayarlar.py
+├── gereksinimler.txt
+├── .env.example
+├── app/
+├── uygulama/
+├── tests/
+└── docs/
+    ├── wix-velo.js
+    ├── wix_landing_page.js
+    ├── wix_dashboard.js
+    └── wix_backend_leads.web.js
+```
+
 ## Yerel kurulum
 
 ```bash
 python -m venv venv
-# Windows: venv\Scripts\activate
-# macOS/Linux: source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+
 pip install -r gereksinimler.txt
-# Windows: copy .env.example .env
-# macOS/Linux: cp .env.example .env
+
+# Windows
+copy .env.example .env
+
+# macOS/Linux
+cp .env.example .env
+
 python run.py
+```
+
+Uygulama varsayılan olarak aşağıdaki adreste çalışır:
+
+```text
+http://localhost:5000
 ```
 
 Kontrol adresleri:
 
-- `http://localhost:5000/health`
-- `POST http://localhost:5000/api/chat`
-- `GET http://localhost:5000/api/interactions`
-- `POST http://localhost:5000/api/leads`
-- `GET http://localhost:5000/api/leads`
+- `GET /health`
+- `POST /api/chat`
+- `GET /api/interactions`
+- `POST /api/leads`
+- `GET /api/leads`
 
-## Test
+Türkçe uyumluluk uçları:
+
+- `GET /saglik-durumu`
+- `POST /api/sohbet`
+- `GET /api/etkilesimler`
+- `POST /api/adaylar`
+- `GET /api/adaylar`
+
+## Otomatik testler
+
+Projede sağlık kontrolü, sohbet, lead kaydı, panel güvenliği, CORS, API sözleşmesi, CSV çıktısı ve arayüz davranışlarını kapsayan 18 otomatik test bulunmaktadır.
+
+Testleri çalıştırmak için:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-## Render
+Başarılı çalıştırmada 18 testin tamamının `OK` sonucu vermesi beklenir.
+
+## Render deployment
+
+Render üzerinde aşağıdaki ayarlar kullanılır:
 
 - Build Command: `pip install -r gereksinimler.txt`
 - Start Command: `gunicorn run:app`
 - Ortam: `FLASK_ORTAMI=uretim`
-- `SECRET_KEY`, `ADMIN_API_KEY` ve seçilen AI sağlayıcısının anahtarı yalnızca Render Environment bölümünde tutulur.
-- Groq kullanılıyorsa `GROQ_MODEL=openai/gpt-oss-20b` tanımlanır.
-- GPT-OSS modeli düşük reasoning düzeyi ve yeterli çıktı bütçesiyle çağrılır; böylece kısa konuşmalarda boş yanıt oluşmaz.
-- `CORS_ALLOWED_ORIGINS` değeri yayımlanmış Wix alan adı olmalıdır.
 
-## Wix Velo
+Aşağıdaki değerler yalnızca Render Environment bölümünde tanımlanmalıdır:
 
-1. Wix'te Dev Mode/Velo açılır.
-2. `docs/wix_landing_page.js` ilgili B2C sayfasına eklenir.
-3. `docs/wix_dashboard.js` yalnızca Wix Members yetkili rolüne açık dashboard sayfasına eklenir.
-4. Her iki dosyadaki `API_BASE_URL`, Render adresiyle değiştirilir.
-5. Mevcut ENCORE CSS'i, Poppins tipografisi, renkleri ve global navigasyonu değiştirilmez.
+- `SECRET_KEY`
+- `ADMIN_API_KEY`
+- `AI_PROVIDER`
+- Seçilen AI sağlayıcısının API anahtarı
+- `CORS_ALLOWED_ORIGINS`
 
-Landing bileşenleri: `#inputQuestion`, `#btnAsk`, `#textAiReply`, `#boxSavePlan`, `#inputName`, `#inputPhone`, `#checkboxConsent`, `#btnSavePlan`, `#textSaveStatus`, `#boxMembershipInvite`, `#btnJoin`, `#btnLater`.
+Groq kullanılıyorsa:
 
-Dashboard bileşenleri: `#repeaterLeads`, `#textLeadName`, `#textLeadPhone`, `#textUserRequest`, `#textAiPlan`, `#textLeadStatus`, `#textLeadDate`, `#textTotalCount`, `#btnRefresh`, `#textLoadingStatus`, `#inputSearch`.
+```text
+AI_PROVIDER=groq
+GROQ_MODEL=openai/gpt-oss-20b
+```
 
-Üretimde etkileşim listeleme çağrısı doğrudan tarayıcıda gizli anahtar taşımamalıdır. Wix backend web modülü üzerinden `X-Admin-Key` eklenerek proxy edilmelidir.
+`CORS_ALLOWED_ORIGINS` değeri yayımlanmış Wix sitesinin alan adı olmalıdır.
+
+Gerçek API anahtarları ve `.env`, `.env.example`, JavaScript dosyaları veya GitHub repository’si içine yazılmamalıdır.
+
+## Wix Velo entegrasyonu
+
+ENCORE Wix sitesi ile Flask backend’i arasındaki bağlantı Wix Velo aracılığıyla kurulmuştur.
+
+### Landing ve kişisel asistan
+
+`docs/wix_landing_page.js` dosyası, Wix üzerindeki kişisel asistan ve plan kaydetme akışının örnek sayfa kodunu içerir.
+
+Landing bileşenleri:
+
+- `#inputQuestion`
+- `#btnAsk`
+- `#textAiReply`
+- `#boxSavePlan`
+- `#inputName`
+- `#inputPhone`
+- `#checkboxConsent`
+- `#btnSavePlan`
+- `#textSaveStatus`
+- `#boxMembershipInvite`
+- `#btnJoin`
+- `#btnLater`
+
+Landing kodundaki API adresi, Render üzerinde yayımlanan ENCORE backend adresiyle değiştirilmelidir.
+
+### Yönetim paneli
+
+`docs/wix_dashboard.js`, Wix yönetim panelinde kullanılan güncel sayfa kodunu içerir.
+
+Yönetim paneli bileşenleri:
+
+- `#leadRepeater`
+- `#txtKullanici`
+- `#txtTelefon`
+- `#txtDurum`
+- `#txtTarih`
+
+Paneldeki arama alanı jüri demosunun görsel arayüz öğesidir. Yenile butonu ise Wix Editor üzerinden yönetim paneli sayfasına yeniden yönlendirilerek kayıtların yenilenmesini sağlar.
+
+### Güvenli Wix backend modülü
+
+Yönetim paneli, Render API’sine doğrudan bağlanmaz. Bunun yerine Wix backend tarafındaki `getLeads()` web metodunu kullanır.
+
+GitHub’daki örnek dosya:
+
+```text
+docs/wix_backend_leads.web.js
+```
+
+Wix içindeki gerçek konumu:
+
+```text
+backend/leads.web.js
+```
+
+Bu modül:
+
+1. `ENCORE_ADMIN_API_KEY` değerini Wix Secrets Manager’dan alır.
+2. Render üzerindeki `GET /api/leads` adresine istek gönderir.
+3. Anahtarı `X-Admin-Key` başlığıyla backend’e iletir.
+4. Gelen lead kayıtlarını Wix yönetim paneline döndürür.
+
+Wix Secrets Manager’da aşağıdaki isimle bir secret oluşturulmalıdır:
+
+```text
+ENCORE_ADMIN_API_KEY
+```
+
+Bu secret’ın değeri, Render üzerinde tanımlanan `ADMIN_API_KEY` ile aynı olmalıdır.
+
+Gerçek anahtar hiçbir zaman Wix sayfa koduna veya GitHub repository’sine yazılmamalıdır.
+
+## Veri akışı
+
+```text
+Ziyaretçi
+   ↓
+Wix kişisel asistan
+   ↓
+ENCORE Flask API
+   ↓
+SQLite veritabanı
+   ↓
+Wix backend web modülü
+   ↓
+Wix yönetim paneli
+```
+
+Kullanıcı kişisel asistanla görüştükten ve iletişim izni verdikten sonra adı, telefonu, plan durumu ve kayıt tarihi veritabanına kaydedilir. Yönetim paneli bu kayıtları güvenli Wix backend bağlantısı üzerinden görüntüler.
+
+## Güvenlik önlemleri
+
+Projede aşağıdaki temel güvenlik önlemleri uygulanmıştır:
+
+- API anahtarlarının ortam değişkenlerinde tutulması
+- `.env` dosyasının `.gitignore` ile korunması
+- SQL sorgularında parametreli sorgular kullanılması
+- CORS alan adı kontrolü
+- Yönetim API’sinde `X-Admin-Key` doğrulaması
+- Wix Secrets Manager kullanımı
+- Telefon, isim, mesaj ve iletişim izni doğrulaması
+- Yönetim panelinin Wix backend üzerinden veri alması
