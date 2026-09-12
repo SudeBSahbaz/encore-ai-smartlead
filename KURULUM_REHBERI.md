@@ -103,7 +103,7 @@ GROQ_MODEL=openai/gpt-oss-20b
 
 `CORS_ALLOWED_ORIGINS` değeri yayımlanmış Wix sitesinin alan adı olmalıdır.
 
-Gerçek API anahtarları ve `.env`, `.env.example`, JavaScript dosyaları veya GitHub repository’si içine yazılmamalıdır.
+Gerçek API anahtarları ve `.env` dosyası GitHub repository’sine yüklenmemelidir. `.env.example` dosyasında yalnızca örnek veya boş değerler bulunmalıdır.
 
 ## Wix Velo entegrasyonu
 
@@ -131,6 +131,7 @@ Render API adresi:
 
 ```text
 https://encore-ai-smartlead.onrender.com
+```
 
 ### Yönetim paneli
 
@@ -144,7 +145,7 @@ Yönetim paneli bileşenleri:
 - `#txtDurum`
 - `#txtTarih`
 
-Paneldeki arama alanı jüri demosunun görsel arayüz öğesidir. Yenile butonu ise Wix Editor üzerinden yönetim paneli sayfasına yeniden yönlendirilerek kayıtların yenilenmesini sağlar.
+Paneldeki arama alanı jüri demosunun görsel arayüz öğesidir. Yenile butonu Wix Editor üzerinden yönetim paneli sayfasına yeniden yönlendirilerek kayıtların yenilenmesini sağlar.
 
 ### Güvenli Wix backend modülü
 
@@ -195,7 +196,7 @@ Wix backend web modülü
 Wix yönetim paneli
 ```
 
-Kullanıcı kişisel asistanla görüştükten ve iletişim izni verdikten sonra adı, telefonu, plan durumu ve kayıt tarihi veritabanına kaydedilir. Yönetim paneli bu kayıtları güvenli Wix backend bağlantısı üzerinden görüntüler.
+Kullanıcının asistan etkileşimleri Flask backend tarafından veritabanına kaydedilir. İletişim izniyle oluşturulan SmartLead kayıtları; kullanıcı adı, telefon, plan durumu ve kayıt tarihiyle yönetim panelinde görüntülenir.
 
 ## Güvenlik önlemleri
 
